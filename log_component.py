@@ -1,4 +1,3 @@
-# log_component.py
 import asyncio
 import aiofiles
 import os
@@ -22,7 +21,8 @@ class LogComponent(ILog):
             try:
                 # Rotate log file if crossing midnight
                 current_date = datetime.now().strftime('%Y%m%d')
-                file_date = os.path.basename(self.file_name)[:8] # Extracts the date from filename, e.g 20240317
+                # Extracts the date from filename, e.g 20240317
+                file_date = os.path.basename(self.file_name)[:8] 
 
                 if current_date != file_date:
                     self.file_name = os.path.join(self.log_directory, f"{current_date}_{datetime.now().strftime('%H%M%S')}.txt")
@@ -52,16 +52,3 @@ class LogComponent(ILog):
         await self.log_queue.join()  # Wait until all items in the queue are processed
         self.stop_event.set()
         self._task.cancel()  # Cancel the background writing task
-
-# Example usage
-if __name__ == "__main__":
-    async def main():
-        logger = LogComponent('logs')
-        await logger.write("Log entry 1")
-        await logger.write("Log entry 2")
-
-        # Stop the logger and wait for all logs to be written
-        logger.stop(wait_for_completion=True)
-        await asyncio.sleep(1)  # Give some time for logs to be written before the script ends
-
-    asyncio.run(main())
